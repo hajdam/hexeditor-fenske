@@ -1,0 +1,39 @@
+group = 'ca.psc-consulting.hexedit'
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = '1.6'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+ext.mainClass = 'hexedit.HexEdit2'
+
+def configureExec(task) {
+    task.main = mainClass
+    task.classpath = sourceSets.main.runtimeClasspath
+}
+
+tasks.withType(JavaCompile) {
+    doFirst {
+        options.fork = true
+        options.bootClasspath = "${System.properties['java.home']}/lib/rt.jar"
+        options.bootClasspath += "$File.pathSeparator${System.properties['java.home']}/jre/lib/jsse.jar"
+    }
+}
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.java
+}
+
+artifacts {
+    archives sourceJar
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': mainClass
+        )
+    }
+}
